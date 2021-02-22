@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+  template:
+    metadata:
+      name: mysql
+      labels:
+        app.kubernetes.io/name: mysql
+      annotations:
+        ad.datadoghq.com/mysql.check_names: '["mysql"]'
+        ad.datadoghq.com/mysql.init_configs: '[{}]'
+        ad.datadoghq.com/mysql.instances: |-
+                [
+                  {
+                    "host": "%%host%%",
+                    "user": "datadog",
+                    "pass":"senha123!"
+                  }
+                ] 
+    spec:
+      initContainers:
+        - name: employees-db
+          image: alpine
+          command:
+            - sh
+            - -c
+            - |-
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/employees.sql && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_departments.dump  && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_employees.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_dept_emp.dump  && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_dept_manager.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_titles.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries1.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries2.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/load_salaries3.dump && \
+              wget -P /seed https://raw.githubusercontent.com/datacharmer/test_db/master/show_elapsed.sql && \
+              sed -i 's/source /source \/docker-entrypoint-initdb.d\//' /seed/*
+              cp /datadog-integration/* /seed
+          volumeMounts:
+            - mountPath: /seed
+              name: seed
+            - mountPath: /datadog-integration
+              name: datadog-integration
+      containers:
+        - name: mysql 
+          image: mysql
+          args: 
+           - --default-authentication-plugin=mysql_native_password
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "100m"
+            limits:
+              memory: "1.5Gi"
+              cpu: "2000m"
+          env:
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: "true"
+            - name: MYSQL_DATABASE
+              value: employees
+            - name: MYSQL_USER
+              value: admin
+            - name: MYSQL_PASSWORD
+              value: senha
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: data
+            - mountPath: /docker-entrypoint-initdb.d
+              name: seed
+      volumes:
+        - emptyDir: {}
+          name: data
+        - emptyDir: {}
+          name: seed
+        - configMap:
+            name: datadog-integration
+          name: datadog-integration
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-integration
+data:
+  datadog.sql: |-
+    CREATE USER 'datadog'@'%' IDENTIFIED WITH mysql_native_password by 'senha123!';
+    GRANT REPLICATION CLIENT ON *.* TO 'datadog'@'%';
+    GRANT PROCESS ON *.* TO 'datadog'@'%';
+    ALTER USER 'datadog'@'%' WITH MAX_USER_CONNECTIONS 5;
+    GRANT SELECT ON performance_schema.* TO 'datadog'@'%';
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: mysql
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
+      nodePort: 30306

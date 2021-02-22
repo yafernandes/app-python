@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-python-v1
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-python
+  template:
+    metadata:
+      name: app-python
+      labels:
+        app.kubernetes.io/name: app-python
+    spec:
+      containers:
+        - name: app-python 
+          image: yaalexf/app-python
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_SERVICE
+              value: "app-python"
+            - name: DD_VERSION
+              value: "0.1"
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-python-v2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-python
+  template:
+    metadata:
+      name: app-python
+      labels:
+        app.kubernetes.io/name: app-python
+        tags.datadoghq.com/service: app-python
+        tags.datadoghq.com/version: "0.2"
+    spec:
+      containers:
+        - name: app-python 
+          image: yaalexf/app-python
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: app-python
+  name: app-python
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: app-python
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30080
