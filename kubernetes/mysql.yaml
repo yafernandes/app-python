@@ -55,11 +55,11 @@ spec:
            - --default-authentication-plugin=mysql_native_password
           resources:
             requests:
-              memory: "1Gi"
-              cpu: "100m"
+              memory: "832Mi"
+              cpu: "5m"
             limits:
-              memory: "1.5Gi"
-              cpu: "2000m"
+              memory: "1Gi"
+              cpu: "1000m"
           env:
             - name: MYSQL_RANDOM_ROOT_PASSWORD
               value: "true"

@@ -18,11 +18,11 @@ spec:
           image: rabbitmq:management-alpine
           resources:
             requests:
-              memory: "1Gi"
-              cpu: "100m"
+              memory: "128Mi"
+              cpu: "20m"
             limits:
-              memory: "1.5Gi"
-              cpu: "2000m"
+              memory: "256Mi"
+              cpu: "500m"
 ---
 kind: Service
 apiVersion: v1

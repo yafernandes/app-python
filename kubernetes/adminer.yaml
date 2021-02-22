@@ -18,11 +18,11 @@ spec:
           image: adminer
           resources:
             requests:
-              memory: "16Mi"
-              cpu: "100m"
+              memory: "14Mi"
+              cpu: "30m"
             limits:
-              memory: "64Mi"
-              cpu: "200m"
+              memory: "18Mi"
+              cpu: "500m"
 ---
 kind: Service
 apiVersion: v1
