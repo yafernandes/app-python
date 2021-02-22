@@ -72,6 +72,45 @@ spec:
             - name: DD_LOGS_INJECTION
               value: "true"
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq-consumer
+  template:
+    metadata:
+      name: rabbitmq-consumer
+      labels:
+        app.kubernetes.io/name: rabbitmq-consumer
+        tags.datadoghq.com/service: rabbitmq-consumer
+        tags.datadoghq.com/version: "0.1"
+    spec:
+      containers:
+        - name: rabbitmq-consumer
+          image: yaalexf/app-python
+          imagePullPolicy: Always
+          command:
+            - ddtrace-run
+            - python3
+            - rabbitmq-consumer.py
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          env:
+            - name: DD_PROFILING_ENABLED
+              value: "true"
+            - name: DD_LOGS_INJECTION
+              value: "true"
+
+---
 kind: Service
 apiVersion: v1
 metadata:

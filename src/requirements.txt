@@ -2,3 +2,4 @@ flask
 ddtrace
 JSON-log-formatter
 mysql-connector-python
+kombu

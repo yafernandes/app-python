@@ -30,7 +30,7 @@
         DD_LOGS.logger.info(`Added ${window.location.origin} to allowedTracingOrigins.`, { "window.location": window.location })
     </script>
     <script>
-        function call(url) {
+        function call(url, method = "GET", payload) {
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
@@ -38,16 +38,21 @@
                         this.responseText;
                 }
             };
-            xhttp.open("GET", url, true);
-            xhttp.send();
+            xhttp.open(method, url, true);
+            xhttp.send(payload);
         }
     </script>
 </head>
 
 <body>
-    <label for="fname">Last name: </label><input type="text" id="last_nane" value="Baba"/></br>
+    <label for="fname">Last name: </label><input type="text" id="last_nane" value="Baba" /></br>
     </br>
-    <button onclick="call(window.location.origin+'/mysql/employee/'+document.getElementById('last_nane').value)">Call backend</button></br>
+    <button onclick="call(window.location.origin+'/mysql/employee/'+document.getElementById('last_nane').value)">Retrieve employees</button></br>
+    </br>
+    </br>
+    <label for="fname">Message: </label><input type="text" id="message" value="Hello world!" /></br>
+    </br>
+    <button onclick="call(window.location.origin+'/rabbitmq/send/datadog', 'POST', document.getElementById('message').value)">Send message</button></br>
     <pre id="response"></pre>
 </body>
 
