@@ -10,9 +10,9 @@
     <script>
         window.DD_RUM &&
             window.DD_RUM.init({
-                clientToken: 'pube2f8283d1c06ffb44bf77b4cf92297e4',
-                applicationId: '88e27b4d-c3bb-496d-bd28-03a908d615ab',
-                site: 'datadoghq.com',
+                clientToken: '{{  clientToken  }}',
+                applicationId: '{{  applicationId  }}',
+                site: '{{  site  }}',
                 service: 'RUM Test',
                 env: 'lab',
                 version: '1.0.0',
@@ -22,8 +22,8 @@
             })
         window.DD_LOGS &&
             DD_LOGS.init({
-                clientToken: 'pube2f8283d1c06ffb44bf77b4cf92297e4',
-                site: 'datadoghq.com',
+                clientToken: '{{  clientToken  }}',
+                site: '{{  site  }}',
                 forwardErrorsToLogs: true,
                 sampleRate: 100,
             })
