@@ -23,6 +23,9 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
+          env:
+            - name: RABBITMQ_VM_MEMORY_HIGH_WATERMARK
+              value: 80%
 ---
 kind: Service
 apiVersion: v1
