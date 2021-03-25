@@ -1,4 +1,5 @@
 # https://ddtrace.readthedocs.io/en/stable/integrations.html#flask
+import datetime
 import hashlib
 import logging
 import os
@@ -9,7 +10,8 @@ import urllib
 import json_log_formatter
 import mysql.connector
 from ddtrace import patch, tracer
-from flask import Flask, jsonify, make_response, request, send_from_directory, render_template
+from flask import (Flask, jsonify, make_response, render_template, request,
+                   send_from_directory)
 from kombu import Connection
 
 # https://ddtrace.readthedocs.io/en/stable/integrations.html#kombu
@@ -36,9 +38,9 @@ MYSQL_HOST = os.environ.get('APP_MYSQL_HOST', 'mysql')
 MYSQL_PORT = int(os.environ.get('APP_MYSQL_PORT', '3306'))
 RABBITMQ_URL = os.environ.get('APP_RABBITMQ_URL', 'amqp://rabbitmq:5672/')
 DD_VERSION = os.environ.get('DD_VERSION', '0.1')
-DD_CLIENT_TOKEN = os.environ.get('DD_CLIENT_TOKEN')
-DD_APPLICATION_ID = os.environ.get('DD_APPLICATION_ID')
-DD_SITE = os.environ.get('DD_SITE', 'datadoghq.com')
+DD_CLIENT_TOKEN = os.environ.get('APP_CLIENT_TOKEN')
+DD_APPLICATION_ID = os.environ.get('APP_APPLICATION_ID')
+DD_SITE = os.environ.get('APP_SITE', 'datadoghq.com')
 
 
 @app.route('/health')
@@ -49,6 +51,18 @@ def hello():
 @app.route('/lab')
 def lab_page():
     return render_template('lab.html', clientToken=DD_CLIENT_TOKEN, applicationId=DD_APPLICATION_ID, site=DD_SITE)
+
+
+@app.route('/portal')
+def portal_page():
+    minutes = datetime.datetime.now().minute
+    return render_template('portal.html', working=minutes <= 40)
+
+
+@app.route('/backend')
+def backend_page():
+    minutes = datetime.datetime.now().minute
+    return render_template('backend.html', working=minutes <= 20)
 
 
 @app.route('/sha512')

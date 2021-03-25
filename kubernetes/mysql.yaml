@@ -14,7 +14,9 @@ spec:
         app.kubernetes.io/name: mysql
       annotations:
         ad.datadoghq.com/mysql.check_names: '["mysql"]'
-        ad.datadoghq.com/mysql.init_configs: '[{}]'
+        ad.datadoghq.com/mysql.init_configs: '[{
+          "service": "mysql"
+        }]'
         ad.datadoghq.com/mysql.instances: |-
                 [
                   {

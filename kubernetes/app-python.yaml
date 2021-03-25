@@ -37,17 +37,19 @@ spec:
               value: "true"
             - name: DD_LOGS_INJECTION
               value: "true"
-            - name: DD_CLIENT_TOKEN
+            - name: DD_RUNTIME_METRICS_ENABLED
+              value: "true"
+            - name: APP_CLIENT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: app-python
                   key: clientToken
-            - name: DD_APPLICATION_ID
+            - name: APP_APPLICATION_ID
               valueFrom:
                 secretKeyRef:
                   name: app-python
                   key: applicationId
-            - name: DD_SITE
+            - name: APP_SITE
               valueFrom:
                 secretKeyRef:
                   name: app-python
@@ -85,6 +87,8 @@ spec:
             - name: DD_PROFILING_ENABLED
               value: "true"
             - name: DD_LOGS_INJECTION
+              value: "true"
+            - name: DD_RUNTIME_METRICS_ENABLED
               value: "true"
             - name: DD_CLIENT_TOKEN
               valueFrom:
@@ -139,7 +143,8 @@ spec:
               value: "true"
             - name: DD_LOGS_INJECTION
               value: "true"
-
+            - name: DD_RUNTIME_METRICS_ENABLED
+              value: "true"
 ---
 kind: Service
 apiVersion: v1
